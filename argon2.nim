@@ -1,4 +1,4 @@
-import std/[base64, locks, sequtils, strformat, strutils]
+import std/[base64, sequtils, strformat, strutils]
 
 import blake2b
 
@@ -396,7 +396,7 @@ proc processSegment(params: tuple[memPtr: ptr MemoryArray, n, slice, lane, lanes
   var offset = params.lane * params.lanes + params.slice * params.segments + index
   var random: uint64
   while index < params.segments:
-    var prev = offset - 1
+    var prev = offset.pred
     # NOTEL: first block of the first slice
     if index == 0 and params.slice == 0:
       # NOTE: select last block in lane
