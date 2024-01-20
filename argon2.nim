@@ -85,8 +85,8 @@ const
   # NOTE: synchronization points are specific positions in the algorithm's execution where the memory
   # state is synchronized across different computational threads or lanes.
   syncPoints: uint32 = 4
-  Argon2_Version_1_3 = 0x13    # 19 in decimal
-  Argon2_Version_1_2_1 = 0x10  # 16 in decimal
+  Argon2_Version_1_3: int = 0x13    # 19 in decimal
+  Argon2_Version_1_2_1: int = 0x10  # 16 in decimal
 
 type
   Word = uint64
