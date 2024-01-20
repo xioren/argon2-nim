@@ -155,7 +155,7 @@ proc bytesToBlock(bytes: seq[byte]): Block =
 
 
 proc blockToBytes(blk: Block): seq[byte] =
-  result = newSeq[byte](1024) # 1024 bytes in a block
+  result = newSeq[byte](blockSizeInBytes)
   for i, word in blk:
     for j in 0 ..< 8:  # 8 bytes in a Word
       result[i * 8 + j] = byte((word shr (j * 8)) and 0xFF)
@@ -248,7 +248,6 @@ proc initHash(params: Argon2Params): seq[byte] =
 
 
 proc initMemoryArray(params: var Argon2Params): MemoryArray =
-  let p = params.parallelism        # number of threads
   var m = params.memoryCost         # original memory cost in kibibytes
 
   # NOTE: adjust memory cost to be a multiple of syncPoints * parallelism
@@ -285,13 +284,13 @@ proc initBlocks(ctx: var Argon2Ctx, h0: seq[byte]) =
     # NOTE: add block index 0 to the extended hash -> compute the block -> update memory
     bts = toBytesLE(uint32(0))
     copyMem(addr modifiedH0[blake2bMaxDigestSize], addr bts[0], bts.len)
-    blk = bytesToBlock(HPrime(modifiedH0, 1024))
+    blk = bytesToBlock(HPrime(modifiedH0, uint32(blockSizeInBytes)))
     ctx.memory[][laneOffset + 0] = blk
     
     # NOTE: repeat for block index 1
     bts = toBytesLE(uint32(1))
     copyMem(addr modifiedH0[blake2bMaxDigestSize], addr bts[0], bts.len)
-    blk = bytesToBlock(HPrime(modifiedH0, 1024))
+    blk = bytesToBlock(HPrime(modifiedH0, uint32(blockSizeInBytes)))
     ctx.memory[][laneOffset + 1] = blk
 
 ##########################################################################
