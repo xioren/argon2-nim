@@ -74,7 +74,7 @@ Configuration:
 
 TODO:
   
-  + add memory clearing
+  + add memory clearing (clear/reset proc?)
   + optimizations and inlining
 ]#
 
@@ -450,11 +450,11 @@ proc digest*(ctx: Argon2Ctx): seq[byte] =
  
   for lane in 0 ..< ctx.params.parallelism:
     let blockIndex = lane * lanes + lanes.pred
+    # NOTE: first lane -> init xorFinalBlock
     if lane == 0:
-      # NOTE: first lane -> init xorFinalBlock
       xorFinalBlock = ctx.memory[][blockIndex]
+    # NOTE: XOR each word of the lane's final block with the corresponding word in xorFinalBlock
     else:
-      # NOTE: XOR each word of the lane's final block with the corresponding word in xorFinalBlock
       for j in 0 ..< 128:
         xorFinalBlock[j] = xorFinalBlock[j] xor ctx.memory[][blockIndex][j]
 
@@ -537,6 +537,7 @@ proc newArgon2Ctx*(
     mode
   )
 
+##########################################################################
 
 when isMainModule:
   include testing
