@@ -18,7 +18,7 @@ Modes:
 
   + Argon2i (Data-Independent Memory Access):
     Argon2i uses data-independent memory access, meaning the sequence of references to the memory blocks is precomputed and independent of the actual block contents.
-    Provides resistence side-channel attacks.
+    Provides resistence to side-channel attacks.
 
   + Argon2id (Hybrid):
     Argon2id combines both approaches: it starts like Argon2i (data-independent) and then switches to Argon2d (data-dependent).
@@ -116,24 +116,24 @@ include blamka
 ##########################################################################
 
 proc validateArgon2Params(params: Argon2Params) =
-  doAssert params.parallelism > 0 and params.parallelism <= (1 shl 24) - 1, 
-           "Parallelism must be between 1 and 2^24 - 1"
+  if not (params.parallelism > 0 and params.parallelism <= (1 shl 24) - 1):
+   raise newException(ValueError, "Parallelism must be between 1 and 2^24 - 1")
 
   # NOTE: must be a power of 2 greater than 1
-  doAssert params.memoryCost >= 8 * params.parallelism and params.memoryCost <= (1 shl 32) - 1,
-           "Memory cost must be between 8 * parallelism and 2^32 - 1"
+  if not (params.memoryCost >= 8 * params.parallelism and params.memoryCost <= (1 shl 32) - 1):
+    raise newException(ValueError, "Memory cost must be between 8 * parallelism and 2^32 - 1")
 
-  doAssert params.timeCost > 0 and params.timeCost <= (1 shl 32) - 1,
-           "Time cost must be between 1 and 2^32 - 1"
+  if not (params.timeCost > 0 and params.timeCost <= (1 shl 32) - 1):
+    raise newException(ValueError, "Time cost must be between 1 and 2^32 - 1")
 
-  doAssert params.digestSize >= 4 and params.digestSize <= (1 shl 32) - 1,
-           "Hash length must be between 4 and 2^32 - 1"
+  if not (params.digestSize >= 4 and params.digestSize <= (1 shl 32) - 1):
+    raise newException(ValueError, "Hash length must be between 4 and 2^32 - 1")
 
-  doAssert params.version in {Argon2_Version_1_3, Argon2_Version_1_2_1},
-           "Version must be either 0x13 (19) or 0x10 (16)"
+  if not (params.version in {Argon2_Version_1_3, Argon2_Version_1_2_1}):
+    raise newException(ValueError, "Version must be either 0x13 (19) or 0x10 (16)")
 
-  doAssert params.mode in {ARGON2D, ARGON2I, ARGON2ID},
-           "Mode must be one of ARGON2D (0), ARGON2I (1), or ARGON2ID (2)"
+  if not (params.mode in {ARGON2D, ARGON2I, ARGON2ID}):
+    raise newException(ValueError, "Mode must be one of ARGON2D (0), ARGON2I (1), or ARGON2ID (2)")
 
 
 proc toBytesLE(value: uint32): seq[byte] =
@@ -144,7 +144,7 @@ proc toBytesLE(value: uint32): seq[byte] =
 
 
 proc bytesToBlock(bytes: seq[byte]): Block =
-  doAssert bytes.len == 1024, "Input byte sequence must be 1024 bytes long for Block conversion"
+  # WARNING: input byte sequence must be 1024 bytes long for Block conversion
   var word: Word
   for i in 0 ..< 128:  # 128 Words (uint64) in a Block
     word = 0
