@@ -8,7 +8,7 @@ General:
 
   + Argon2 RFC: https://www.rfc-editor.org/rfc/rfc9106.txt
   + This implementation is based heavily on https://cs.opensource.google/go/x/crypto/+/master:argon2/
-  + heavily commented for algorithm flow and understanding
+  + thoroughly commented for algorithm flow and comprehension
 
 Modes:
 
@@ -259,6 +259,7 @@ proc initMemoryArray(params: var Argon2Params): MemoryArray =
   
   # NOTE: initialize memory array with adjusted number of blocks (cost)
   result = newSeq[Block](params.memoryCost)
+  # NOTE: zeroing the memory is not necessary as Nim initializes with zeros by default
 
 
 proc initBlocks(ctx: var Argon2Ctx, h0: seq[byte]) =
