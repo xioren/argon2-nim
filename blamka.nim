@@ -122,8 +122,8 @@ proc processBlockGeneric(dest: var Block, in1, in2: Block, doXOR: bool) =
   #[
     processes a block of data using the BlaMka function
     
-    # dest: block where the result is stored
-    # in1, in2: blocks to be processed
+    dest: block where the result is stored
+    in1, in2: blocks to be processed
   ]#
   var t: Block
 
