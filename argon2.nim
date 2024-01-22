@@ -144,7 +144,7 @@ proc toBytesLE(value: uint32): seq[byte] =
 
 
 proc bytesToBlock(bytes: seq[byte]): Block =
-  # WARNING: input byte sequence must be 1024 bytes long for Block conversion
+  # NOTE: input byte sequence must be 1024 bytes long for Block conversion
   var word: Word
   for i in 0 ..< 128:  # 128 Words (uint64) in a Block
     word = 0
@@ -222,6 +222,7 @@ proc initArgon2Params(
 
 
 proc initHash(params: Argon2Params): seq[byte] =
+  ##: create initial hash based on input parameters
   var blake2bCtx = newBlake2bCtx(digestSize = 64)
 
   # NOTE: convert tuning parameters to bytes in little-endian order and update BLAKE2b state
@@ -248,13 +249,13 @@ proc initHash(params: Argon2Params): seq[byte] =
 
 
 proc initMemoryArray(params: var Argon2Params): MemoryArray =
-  var m = params.memoryCost         # original memory cost in kibibytes
+  var mPrime = params.memoryCost         # original memory cost in kibibytes
 
   # NOTE: adjust memory cost to be a multiple of syncPoints * parallelism
-  m = m div (syncPoints * params.parallelism) * (syncPoints * params.parallelism)
-  if m < 2 * syncPoints * params.parallelism:
-    m = 2 * syncPoints * params.parallelism
-  params.memoryCost = m
+  mPrime = mPrime div (syncPoints * params.parallelism) * (syncPoints * params.parallelism)
+  if mPrime < 2 * syncPoints * params.parallelism:
+    mPrime = 2 * syncPoints * params.parallelism
+  params.memoryCost = mPrime
   
   # NOTE: initialize memory array with adjusted number of blocks (cost)
   result = newSeq[Block](params.memoryCost)
@@ -275,6 +276,7 @@ proc initBlocks(ctx: var Argon2Ctx, h0: seq[byte]) =
     let laneOffset = lane * (ctx.params.memoryCost div ctx.params.parallelism)
     # NOTE: make a copy of the initial hash and extend it
     modifiedH0 = h0
+    # QUESTION: should we set length when the hash is generated?
     modifiedH0.setLen(h0.len + 8)
 
     # NOTE: convert the lane number to bytes in little-endian format and add to extended hash
@@ -341,7 +343,7 @@ proc indexAlpha(rand: uint64; lanes, segments, threads, n, slice, lane, index: u
     
     returns: uint32 index
   ]#
-  # NOTE: # determine reference lane
+  # NOTE: determine reference lane
   var refLane = uint32(rand shr 32) mod threads
   # NOTE: first slice of the first pass
   if n == 0 and slice == 0:
@@ -490,7 +492,6 @@ proc newArgon2Ctx*(
   version: Positive = Argon2_Version_1_3, 
   mode: Mode = ARGON2ID
 ): Argon2Ctx =
-  # WARNING: Argon2 contexts are single use ONLY.
 
   result.params = initArgon2Params(
     password, salt, secret, assocData,
