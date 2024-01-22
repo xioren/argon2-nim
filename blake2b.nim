@@ -174,7 +174,8 @@ proc hexDigest*(ctx: Blake2bCtx): string =
 
 
 proc initBlake2bCtx(ctx: var Blake2bCtx, key, salt, personal: openArray[byte], digestSize: int) =
-  doAssert(digestSize <= maxDigestSize, "digest size exceeds maximum $1 bytes" % $maxDigestSize)
+  if not (digestSize <= maxDigestSize):
+    raise newException(ValueError, "digest size exceeds maximum $1 bytes" % $maxDigestSize)
   if digestSize > 0:
     ctx.digestSize = digestSize
   else:
@@ -192,11 +193,13 @@ proc initBlake2bCtx(ctx: var Blake2bCtx, key, salt, personal: openArray[byte], d
 
   # NOTE: copy salt and personalization into the parameter block
   if salt.len > 0:
-    doAssert(salt.len <= maxSaltSize, "salt size exceeds maximum $1 bytes" % $maxSaltSize)
+    if not (salt.len <= maxSaltSize):
+      raise newException(ValueError, "salt size exceeds maximum $1 bytes" % $maxSaltSize) 
     copyMem(addr P[4], unsafeAddr salt[0], salt.len)
 
   if personal.len > 0:
-    doAssert(personal.len <= maxPersonSize, "personalization size exceeds maximum $1 bytes" % $maxPersonSize)
+    if not (personal.len <= maxPersonSize):
+      raise newException(ValueError, "personalization size exceeds maximum $1 bytes" % $maxPersonSize)
     copyMem(addr P[6], unsafeAddr personal[0], personal.len)
   
   # NOTE: XOR state with the first 8 words of the parameter block
@@ -205,7 +208,8 @@ proc initBlake2bCtx(ctx: var Blake2bCtx, key, salt, personal: openArray[byte], d
   
   # NOTE: pad key and add to buffer
   if key.len > 0:
-    doAssert(key.len <= maxKeySize, "key size exceeds maximum $1 bytes" % $maxKeySize)
+    if not (key.len <= maxKeySize):
+      raise newException(ValueError, "key size exceeds maximum $1 bytes" % $maxKeySize)
     var padKey: array[blockSize, uint8]
     copyMem(addr padKey[0], unsafeAddr key[0], key.len)
     ctx.update(padKey)
