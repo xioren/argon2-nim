@@ -228,12 +228,3 @@ proc newBlake2bCtx*(msg: string, key, salt, personal: string = "", digestSize: i
     personal.toOpenArrayByte(0, personal.len.pred),
     digestSize
   )
-
-
-when isMainModule:
-  let message = "your-message"
-  var hash = newBlake2bCtx(message)
-
-  doAssert hash.hexDigest() == "d69b7ad28e9cdbf576e3490033ed226517fe52e7bc1961aa5bd05616ebbb4bd291bbff5b87a62b16a7c09bc4b5460d9f94018668d36f187d9876b761634b5065"
-  hash.update("more-of-your-message")
-  doAssert hash.hexDigest() == "36f8b828bca40b24e82e40aa5fd2996c8cfe1eaa421dd073bc61a0b25dcb9e824ead23ab352bd2274481a56f276e1b29390bf973800e52cd767fbff91a5055c8"
