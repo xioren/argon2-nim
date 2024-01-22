@@ -8,7 +8,7 @@ General:
 
   + Argon2 RFC: https://www.rfc-editor.org/rfc/rfc9106.txt
   + This implementation is based heavily on https://cs.opensource.google/go/x/crypto/+/master:argon2/
-  + thoroughly commented for algorithm flow and comprehension
+  + Thoroughly commented for algorithm flow and comprehension
 
 Modes:
 
