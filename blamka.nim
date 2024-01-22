@@ -120,7 +120,7 @@ proc blamka(v00, v01, v02, v03, v04, v05, v06, v07, v08, v09, v10, v11, v12, v13
 
 proc processBlockGeneric(dest: var Block, in1, in2: Block, doXOR: bool) =
   #[
-    processes a block of data for Argon2 using the BlaMka function
+    processes a block of data using the BlaMka function
     
     # dest: block where the result is stored
     # in1, in2: blocks to be processed
