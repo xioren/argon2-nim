@@ -74,7 +74,7 @@ proc compress(ctx: var Blake2bCtx, lastBlock: bool = false) =
   for i in 0 ..< 16:
     m[i] = toLittleEndian64(ctx.buffer, i * 8)
 
-  # NOTE: repare the message schedule
+  # NOTE: prepare the message schedule
   var v: array[16, uint64]
   for i in 0 ..< 8:
     v[i] = ctx.state[i]         # initialize v[0..7] with the current hash state
