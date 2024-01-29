@@ -9,7 +9,6 @@ type
     bufferIdx:  uint8            # track data in buffer
     digestSize: int
 
-# NOTE: max message length 0 <= m < 2**128
 const
   blockSize     = 128 # buffer size
   rounds        = 12  # number of compression rounds
@@ -176,10 +175,7 @@ proc hexDigest*(ctx: Blake2bCtx): string =
 proc initBlake2bCtx(ctx: var Blake2bCtx, key, salt, personal: openArray[byte], digestSize: int) =
   if not (digestSize <= maxDigestSize):
     raise newException(ValueError, "digest size exceeds maximum $1 bytes" % $maxDigestSize)
-  if digestSize > 0:
-    ctx.digestSize = digestSize
-  else:
-    ctx.digestSize = maxDigestSize
+  ctx.digestSize = digestSize
   
   # NOTE: initialize hash state with IV
   for i in 0 ..< wordsInState:
@@ -215,7 +211,7 @@ proc initBlake2bCtx(ctx: var Blake2bCtx, key, salt, personal: openArray[byte], d
     ctx.update(padKey)
 
 
-proc newBlake2bCtx*(msg, key, salt, personal: openArray[byte] = @[], digestSize: int = 0): Blake2bCtx =
+proc newBlake2bCtx*(msg, key, salt, personal: openArray[byte] = @[], digestSize: int = maxDigestSize): Blake2bCtx =
   var ctx: Blake2bCtx
   initBlake2bCtx(ctx, key, salt, personal, digestSize)
   if msg.len > 0:
@@ -224,7 +220,7 @@ proc newBlake2bCtx*(msg, key, salt, personal: openArray[byte] = @[], digestSize:
   return ctx
 
 
-proc newBlake2bCtx*(msg: string, key, salt, personal: string = "", digestSize: int = 0): Blake2bCtx =
+proc newBlake2bCtx*(msg: string, key, salt, personal: string = "", digestSize: int = maxDigestSize): Blake2bCtx =
   return newBlake2bCtx(
     msg.toOpenArrayByte(0, msg.len.pred), 
     key.toOpenArrayByte(0, key.len.pred),
