@@ -211,7 +211,7 @@ proc initBlake2bCtx(ctx: var Blake2bCtx, key, salt, personal: openArray[byte], d
     ctx.update(padKey)
 
 
-proc newBlake2bCtx*(msg, key, salt, personal: openArray[byte] = @[], digestSize: int = maxDigestSize): Blake2bCtx =
+proc newBlake2bCtx*(msg: openArray[byte], key, salt, personal: openArray[byte] = @[], digestSize: int = maxDigestSize): Blake2bCtx =
   var ctx: Blake2bCtx
   initBlake2bCtx(ctx, key, salt, personal, digestSize)
   if msg.len > 0:
