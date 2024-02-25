@@ -484,7 +484,8 @@ proc encoded*(ctx: Argon2Ctx): string =
 ##########################################################################
 
 proc newArgon2Ctx*(
-  password, salt, secret, assocData: openArray[byte],
+  password, salt: openArray[byte], 
+  secret, assocData: openArray[byte] = @[],
   timeCost: Positive = 2,
   memoryCost: Positive = 16,
   parallelism: Positive = 1,
